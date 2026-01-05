@@ -1,0 +1,40 @@
+name: 德州扑克 Android APK 构建
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 安装系统依赖
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip openjdk-8-jdk wget ant
+        
+    - name: 安装 Buildozer
+      run: |
+        pip install buildozer cython virtualenv
+        
+    - name: 构建 APK
+      run: |
+        buildozer -v android debug
+        
+    - name: 上传 APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: texaspoker-apk
+        path: bin/*.apk
